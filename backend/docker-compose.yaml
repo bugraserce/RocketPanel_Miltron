@@ -1,0 +1,39 @@
+version: '3.8'
+services:
+
+  # Launchsite Service
+  app:
+    image: 'miltronhub/launchsite:1.0.0'
+    ports:
+      - '5000:5000'
+      - '4000-4009:4000-4009'
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "10"
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+    environment:
+      - CORS_ALLOWED_ORIGINS=http://localhost:5173
+    networks:
+      - app-network
+
+  # Client Service
+  client:
+    build: ./client
+    working_dir: /usr/src/app
+    volumes:
+      - ./client:/usr/src/app
+    command: npm start
+    ports:
+      - '5173:5173'
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
